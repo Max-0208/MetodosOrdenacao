@@ -102,6 +102,169 @@ double selectionSort(int arr[]){
     return sortTime;
 }
 
+double insertionSort(int arr[]){
+	int i, j, aux;
+	double sortTime;
+	clock_t start = clock();
+	
+	for(i=0; i<TAMARR - 1; i++){
+		if(arr[i] > arr[i+1]){
+			aux = arr[i+1];
+			arr[i+1] = arr[i]; arr[i] = aux;
+			j = i -1;
+			while(j >= 0){
+				if(aux < arr[j]){
+					arr[j+1] = arr[j]; arr[j] = aux;
+				}else{
+					break;
+				}
+				j= j-1;
+			}
+		} 
+	}
+	clock_t end = clock();
+    double cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    sortTime = cpu_time_used;
+    return sortTime;
+}
+
+double heapSort(int arr[]) {
+    double sortTime;
+    clock_t start = clock();
+    
+    int n = TAMARR;
+    int i, j, pai, filho, t;
+    
+    for (i = 1; i < n; i++) {
+        filho = i;
+        while (filho > 0) {
+            pai = (filho - 1) / 2;
+            if (arr[pai] < arr[filho]) {
+                t = arr[pai];
+                arr[pai] = arr[filho];
+                arr[filho] = t;
+                filho = pai;
+            }
+            else break;
+        }
+    }
+    
+    for (i = n-1; i > 0; i--) {
+        t = arr[0];
+        arr[0] = arr[i];
+        arr[i] = t;
+        pai = 0;
+        filho = 1;
+        
+        while (filho < i) {
+            if (filho + 1 < i && arr[filho + 1] > arr[filho])
+                filho++;
+            if (arr[filho] > arr[pai]) {
+                t = arr[pai];
+                arr[pai] = arr[filho];
+                arr[filho] = t;
+                pai = filho;
+                filho = 2 * pai + 1;
+            }
+            else break;
+        }
+    }
+    
+    clock_t end = clock();
+    sortTime = ((double) (end - start)) / CLOCKS_PER_SEC;
+    return sortTime;
+}
+
+double quickSort(int arr[]) {
+    double sortTime;
+    clock_t start = clock();
+    
+    int pilha[TAMARR];
+    int topo = -1;
+    int inicio = 0;
+    int fim = TAMARR - 1;
+    int i, j, temp, pivo, pi;
+    
+    pilha[++topo] = inicio;
+    pilha[++topo] = fim;
+    
+    while (topo >= 0) {
+        fim = pilha[topo--];
+        inicio = pilha[topo--];
+        
+        pivo = arr[fim];
+        i = (inicio - 1);
+        
+        for (j = inicio; j <= fim - 1; j++) {
+            if (arr[j] <= pivo) {
+                i++;
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        temp = arr[i + 1];
+        arr[i + 1] = arr[fim];
+        arr[fim] = temp;
+        pi = i + 1;
+        
+        if (pi - 1 > inicio) {
+            pilha[++topo] = inicio;
+            pilha[++topo] = pi - 1;
+        }
+        
+        if (pi + 1 < fim) {
+            pilha[++topo] = pi + 1;
+            pilha[++topo] = fim;
+        }
+    }
+    
+    clock_t end = clock();
+    sortTime = ((double) (end - start)) / CLOCKS_PER_SEC;
+    return sortTime;
+}
+
+double mergeSort(int arr[]) {
+    double sortTime;
+    clock_t start = clock();
+    
+    int* temp = (int*)malloc(TAMARR * sizeof(int));
+    int tam_bloco, inicio1, inicio2, fim1, fim2;
+    int i, j, k;
+    
+    for (tam_bloco = 1; tam_bloco < TAMARR; tam_bloco *= 2) {
+        for (inicio1 = 0; inicio1 < TAMARR - tam_bloco; inicio1 += 2 * tam_bloco) {
+            inicio2 = inicio1 + tam_bloco;
+            fim1 = inicio2 - 1;
+            fim2 = (inicio2 + tam_bloco - 1 < TAMARR - 1)? inicio2 + tam_bloco - 1 : TAMARR - 1;
+            
+            i = inicio1;
+            j = inicio2;
+            k = inicio1;
+            while (i <= fim1 && j <= fim2) {
+                if (arr[i] <= arr[j])
+                    temp[k++] = arr[i++];
+                else
+                    temp[k++] = arr[j++];
+            }
+            
+            while (i <= fim1)
+                temp[k++] = arr[i++];
+            while (j <= fim2)
+                temp[k++] = arr[j++];
+            
+            for (i = inicio1; i <= fim2; i++)
+                arr[i] = temp[i];
+        }
+    }
+    
+    free(temp);
+    
+    clock_t end = clock();
+    sortTime = ((double) (end - start)) / CLOCKS_PER_SEC;
+    return sortTime;
+}
+
 //void mostrarTodosResultados(double bubble, double selection, double insertion, double heap, double quick, double merge, double shell, double bucket, double counting, double radix)
 
 int main(){
@@ -128,19 +291,19 @@ int main(){
             case 3:
                 selectionTime = mostrarResultado(arr, selectionSort);
                 break;
-            /*
             case 4:
-                insertionSort (arr);
+                insertionTime = mostrarResultado(arr, insertionSort);
                 break;
-            case 5:
-                heapSort (arr);
-                break;
-            case 6:
-                quickSort (arr);
-                break;
-            case 7:
-                mergeSort (arr);
-                break;
+           	case 5:
+    			heapTime = mostrarResultado(arr, heapSort);
+    			break;
+			case 6:
+    			quickTime = mostrarResultado(arr, quickSort);
+    			break;
+			case 7:
+    			mergeTime = mostrarResultado(arr, mergeSort);
+    			break;
+    		/*
             case 8:
                 shellSort (arr);
                 break;
@@ -161,6 +324,18 @@ int main(){
                 if (selectionTime == 0){
                     selectionTime = selectionSort(arr);
                 }
+                if (insertionTime == 0){
+                	insertionTime = insertionSort(arr);
+				}
+				if(heapTime == 0){
+					heapTime = 	heapSort(arr);
+				}
+				if(quickTime == 0){
+					quickTime = quickSort(arr);
+				}
+				if(mergeTime == 0){
+					mergeTime = mergeSort(arr);
+				}
                 printf("+-------------------------------------------------------------+\n");
                 printf("|                  Resultados das ordenações                  |\n");
                 printf("|Bubble   : %.3f segundos                                    |\n", bubbleTime);
