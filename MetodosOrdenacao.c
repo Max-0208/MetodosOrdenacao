@@ -7,6 +7,9 @@
 
 void imprimirMenu(){
     printf("+-------------------------------------------------------------+\n");
+    printf("|                                                             |\n");
+    printf("|                            Menu                             |\n");
+    printf("|                                                             |\n");
     printf("|(1) Preencher o array com números aleatórios                 |\n");
     printf("|(2) Ordenar o array pelo método Bubble Sort                  |\n");
     printf("|(3) Ordenar o array pelo método Selection Sort               |\n");
@@ -106,7 +109,7 @@ double insertionSort(int arr[]){
 	int i, j, aux;
 	double sortTime;
 	clock_t start = clock();
-	
+
 	for(i=0; i<TAMARR - 1; i++){
 		if(arr[i] > arr[i+1]){
 			aux = arr[i+1];
@@ -120,7 +123,7 @@ double insertionSort(int arr[]){
 				}
 				j= j-1;
 			}
-		} 
+		}
 	}
 	clock_t end = clock();
     double cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
@@ -131,10 +134,10 @@ double insertionSort(int arr[]){
 double heapSort(int arr[]) {
     double sortTime;
     clock_t start = clock();
-    
+
     int n = TAMARR;
     int i, j, pai, filho, t;
-    
+
     for (i = 1; i < n; i++) {
         filho = i;
         while (filho > 0) {
@@ -148,14 +151,14 @@ double heapSort(int arr[]) {
             else break;
         }
     }
-    
+
     for (i = n-1; i > 0; i--) {
         t = arr[0];
         arr[0] = arr[i];
         arr[i] = t;
         pai = 0;
         filho = 1;
-        
+
         while (filho < i) {
             if (filho + 1 < i && arr[filho + 1] > arr[filho])
                 filho++;
@@ -169,7 +172,7 @@ double heapSort(int arr[]) {
             else break;
         }
     }
-    
+
     clock_t end = clock();
     sortTime = ((double) (end - start)) / CLOCKS_PER_SEC;
     return sortTime;
@@ -178,23 +181,23 @@ double heapSort(int arr[]) {
 double quickSort(int arr[]) {
     double sortTime;
     clock_t start = clock();
-    
+
     int pilha[TAMARR];
     int topo = -1;
     int inicio = 0;
     int fim = TAMARR - 1;
     int i, j, temp, pivo, pi;
-    
+
     pilha[++topo] = inicio;
     pilha[++topo] = fim;
-    
+
     while (topo >= 0) {
         fim = pilha[topo--];
         inicio = pilha[topo--];
-        
+
         pivo = arr[fim];
         i = (inicio - 1);
-        
+
         for (j = inicio; j <= fim - 1; j++) {
             if (arr[j] <= pivo) {
                 i++;
@@ -207,18 +210,18 @@ double quickSort(int arr[]) {
         arr[i + 1] = arr[fim];
         arr[fim] = temp;
         pi = i + 1;
-        
+
         if (pi - 1 > inicio) {
             pilha[++topo] = inicio;
             pilha[++topo] = pi - 1;
         }
-        
+
         if (pi + 1 < fim) {
             pilha[++topo] = pi + 1;
             pilha[++topo] = fim;
         }
     }
-    
+
     clock_t end = clock();
     sortTime = ((double) (end - start)) / CLOCKS_PER_SEC;
     return sortTime;
@@ -227,17 +230,17 @@ double quickSort(int arr[]) {
 double mergeSort(int arr[]) {
     double sortTime;
     clock_t start = clock();
-    
+
     int* temp = (int*)malloc(TAMARR * sizeof(int));
     int tam_bloco, inicio1, inicio2, fim1, fim2;
     int i, j, k;
-    
+
     for (tam_bloco = 1; tam_bloco < TAMARR; tam_bloco *= 2) {
         for (inicio1 = 0; inicio1 < TAMARR - tam_bloco; inicio1 += 2 * tam_bloco) {
             inicio2 = inicio1 + tam_bloco;
             fim1 = inicio2 - 1;
             fim2 = (inicio2 + tam_bloco - 1 < TAMARR - 1)? inicio2 + tam_bloco - 1 : TAMARR - 1;
-            
+
             i = inicio1;
             j = inicio2;
             k = inicio1;
@@ -247,25 +250,23 @@ double mergeSort(int arr[]) {
                 else
                     temp[k++] = arr[j++];
             }
-            
+
             while (i <= fim1)
                 temp[k++] = arr[i++];
             while (j <= fim2)
                 temp[k++] = arr[j++];
-            
+
             for (i = inicio1; i <= fim2; i++)
                 arr[i] = temp[i];
         }
     }
-    
+
     free(temp);
-    
+
     clock_t end = clock();
     sortTime = ((double) (end - start)) / CLOCKS_PER_SEC;
     return sortTime;
 }
-
-//void mostrarTodosResultados(double bubble, double selection, double insertion, double heap, double quick, double merge, double shell, double bucket, double counting, double radix)
 
 int main(){
     int arr[TAMARR];
