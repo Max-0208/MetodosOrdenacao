@@ -314,41 +314,41 @@ double shellSort(int arr[]){
     return sortTime;
 }
 
-double bucketSort(int arr[]){
+float bucketSort(int arr[]) {
+	double sortTime;
     int i, j, k;
-    double sortTime;
-
+    int max = arr[0];
+    int min = arr[0];
+    
     preencherArray(arr);
     clock_t start = clock();
-
-    int baldes[QTDBALDES][TAMARR] = {0};
-    int contaBaldes[QTDBALDES] = {0};
-
+    
+    for (i = 1; i < TAMARR; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+        if (arr[i] < min) {
+            min = arr[i];
+        }
+    }
+    
+    int range = max - min + 1;
+    int* count = (int*)calloc(range, sizeof(int));
+    
     for (i = 0; i < TAMARR; i++) {
-        int indiceBalde = arr[i] / 100;
-        baldes[indiceBalde][contaBaldes[indiceBalde]++] = arr[i];
+        count[arr[i] - min]++;
     }
-
-    for (i = 0; i < QTDBALDES; i++) {
-        for (j = 1; j < contaBaldes[i]; j++) {
-            int chave = baldes[i][j];
-            int k = j - 1;
-            while (k >= 0 && baldes[i][k] > chave) {
-                baldes[i][k + 1] = baldes[i][k];
-                k--;
-            }
-            baldes[i][k + 1] = chave;
+    
+    int index = 0;
+    for (i = 0; i < range; i++) {
+        for (j = 0; j < count[i]; j++) {
+            arr[index++] = i + min;
         }
     }
-
-    int indice = 0;
-    for (i = 0; i < QTDBALDES; i++) {
-        for (j = 0; j < contaBaldes[i]; j++) {
-            arr[indice++] = baldes[i][j];
-        }
-    }
-
-    clock_t end = clock();
+    
+    free(count);
+    
+     clock_t end = clock();
     double cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     sortTime = cpu_time_used;
     return sortTime;
