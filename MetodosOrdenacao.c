@@ -2,8 +2,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include <locale.h>
+#define MAXVALOR 200000
 #define TAMARR 50000
 #define TAMARR1 TAMARR-200
+#define QTDBALDES 200
 
 void imprimirMenu(){
     printf("+-------------------------------------------------------------+\n");
@@ -20,9 +22,8 @@ void imprimirMenu(){
     printf("|(8) Ordenar o array pelo método Shell Sort                   |\n");
     printf("|(9) Ordenar o array pelo método Bucket Sort                  |\n");
     printf("|(10) Ordenar o array pelo método Counting Sort               |\n");
-    printf("|(11) Ordenar o array pelo método Radix Sort                  |\n");
-    printf("|(12) Imprimir resultados dos métodos de ordenação executados |\n");
-    printf("|(13) Imprimir o array                                        |\n");
+    printf("|(11) Imprimir resultados dos métodos de ordenação executados |\n");
+    printf("|(12) Imprimir o array                                        |\n");
     printf("|(0) Encerrar o programa                                      |\n");
     printf("+-------------------------------------------------------------+\n");
     printf("Digite sua opção: ");
@@ -31,7 +32,7 @@ void imprimirMenu(){
 void preencherArray(int arr[]){
     int i;
     for(i=0; i<TAMARR; i++){
-        arr[i] = rand()%200000;
+        arr[i] = rand()%MAXVALOR;
     }
 }
 
@@ -44,6 +45,7 @@ void imprimirArray(int arr[]){
     for(i=TAMARR1; i<TAMARR; i++){
         printf("%7d", arr[i]);
     }
+    printf("\n\n");
 }
 
 double mostrarResultado(int arr[], double (*funcao)(int)){
@@ -62,14 +64,13 @@ double mostrarResultado(int arr[], double (*funcao)(int)){
 double bubbleSort(int arr[]){
     int i,j,trocaNum;
     double sortTime;
+
+    preencherArray(arr);
     clock_t start = clock();
 
     for(i=0; i<TAMARR; i++){
-
         for(j=0; j<TAMARR; j++){
-
             if(arr[j] > arr[j+1]){
-
                 trocaNum = arr[j];
                 arr[j] = arr[j+1];
                 arr[j+1] = trocaNum;
@@ -86,6 +87,8 @@ double bubbleSort(int arr[]){
 double selectionSort(int arr[]){
     int i,j, min;
     double sortTime;
+
+    preencherArray(arr);
     clock_t start = clock();
 
     for(i=0; i<TAMARR - 1; i++) {
@@ -108,6 +111,8 @@ double selectionSort(int arr[]){
 double insertionSort(int arr[]){
 	int i, j, aux;
 	double sortTime;
+
+	preencherArray(arr);
 	clock_t start = clock();
 
 	for(i=0; i<TAMARR - 1; i++){
@@ -133,6 +138,8 @@ double insertionSort(int arr[]){
 
 double heapSort(int arr[]) {
     double sortTime;
+
+    preencherArray(arr);
     clock_t start = clock();
 
     int n = TAMARR;
@@ -180,6 +187,8 @@ double heapSort(int arr[]) {
 
 double quickSort(int arr[]) {
     double sortTime;
+
+    preencherArray(arr);
     clock_t start = clock();
 
     int pilha[TAMARR];
@@ -229,6 +238,8 @@ double quickSort(int arr[]) {
 
 double mergeSort(int arr[]) {
     double sortTime;
+
+    preencherArray(arr);
     clock_t start = clock();
 
     int* temp = (int*)malloc(TAMARR * sizeof(int));
@@ -268,10 +279,122 @@ double mergeSort(int arr[]) {
     return sortTime;
 }
 
+double shellSort(int arr[]){
+    int i,j,trocaNum;
+    double sortTime;
+    float k=log(TAMARR+1)/log(3);
+    k=floor(k+0.5);
+    int h=(pow(3,k)-1)/2;
+
+    preencherArray(arr);
+    clock_t start = clock();
+
+    while(h>0){
+        for(i=0; i<TAMARR-h; i++){
+            if(arr[i] > arr[i+h]){
+                trocaNum = arr[i+h];
+                arr[i+h] = arr[i];
+                arr[i] = trocaNum;
+                j=i-h;
+                while(j>=0){
+                    if(trocaNum < arr[j]){
+                        arr[j+h] = arr[j];
+                        arr[j] = trocaNum;
+                    }else{break;}
+                    j=j-h;
+                }
+            }
+        }
+        h=(h-1)/3;
+    }
+
+    clock_t end = clock();
+    double cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    sortTime = cpu_time_used;
+    return sortTime;
+}
+
+double bucketSort(int arr[]){
+    int i, j, k;
+    double sortTime;
+
+    preencherArray(arr);
+    clock_t start = clock();
+
+    int baldes[QTDBALDES][TAMARR] = {0};
+    int contaBaldes[QTDBALDES] = {0};
+
+    for (i = 0; i < TAMARR; i++) {
+        int indiceBalde = arr[i] / 100;
+        baldes[indiceBalde][contaBaldes[indiceBalde]++] = arr[i];
+    }
+
+    for (i = 0; i < QTDBALDES; i++) {
+        for (j = 1; j < contaBaldes[i]; j++) {
+            int chave = baldes[i][j];
+            int k = j - 1;
+            while (k >= 0 && baldes[i][k] > chave) {
+                baldes[i][k + 1] = baldes[i][k];
+                k--;
+            }
+            baldes[i][k + 1] = chave;
+        }
+    }
+
+    int indice = 0;
+    for (i = 0; i < QTDBALDES; i++) {
+        for (j = 0; j < contaBaldes[i]; j++) {
+            arr[indice++] = baldes[i][j];
+        }
+    }
+
+    clock_t end = clock();
+    double cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    sortTime = cpu_time_used;
+    return sortTime;
+}
+
+double countingSort(int arr[]){
+    int i,j;
+    int max = arr[0];
+    double sortTime;
+
+    preencherArray(arr);
+    clock_t start = clock();
+
+    for (i = 1; i < TAMARR; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+
+    int count[max + 1];
+    for (i = 0; i <= max; ++i) {
+        count[i] = 0;
+    }
+
+    for (i = 0; i < TAMARR; ++i) {
+        count[arr[i]]++;
+    }
+
+    int index = 0;
+    for (i = 0; i <= max; ++i) {
+        while (count[i] != 0) {
+            arr[index++] = i;
+            count[i]--;
+        }
+    }
+
+    clock_t end = clock();
+    double cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    sortTime = cpu_time_used;
+    return sortTime;
+}
+
 int main(){
     int arr[TAMARR];
     int opMenu;
-    double bubbleTime = 0, selectionTime = 0, insertionTime = 0, heapTime = 0, quickTime = 0, mergeTime = 0, shellTime = 0, bucketTime = 0, countingTime = 0, radixTime = 0;
+    double bubbleTime = 0, selectionTime = 0, insertionTime = 0, heapTime = 0, quickTime = 0, mergeTime = 0, shellTime = 0, bucketTime = 0, countingTime = 0;
 
     setlocale(LC_ALL, "Portuguese");
 
@@ -304,21 +427,16 @@ int main(){
 			case 7:
     			mergeTime = mostrarResultado(arr, mergeSort);
     			break;
-    		/*
             case 8:
-                shellSort (arr);
+                shellTime = mostrarResultado(arr, shellSort);
                 break;
             case 9:
-                bucketSort (arr);
+                bucketTime = mostrarResultado(arr, bucketSort);
                 break;
             case 10:
-                countingSort (arr);
+                countingTime = mostrarResultado(arr, countingSort);
                 break;
             case 11:
-                radixSort (arr);
-                break;
-            */
-            case 12:
                 if (bubbleTime == 0){
                     bubbleTime = bubbleSort(arr);
                 }
@@ -337,6 +455,15 @@ int main(){
 				if(mergeTime == 0){
 					mergeTime = mergeSort(arr);
 				}
+				if(shellTime == 0){
+					shellTime = shellSort(arr);
+				}
+				if(bucketTime == 0){
+					bucketTime = bucketSort(arr);
+				}
+				if(countingTime == 0){
+					countingTime = countingSort(arr);
+				}
                 printf("+-------------------------------------------------------------+\n");
                 printf("|                  Resultados das ordenações                  |\n");
                 printf("|Bubble   : %.3f segundos                                    |\n", bubbleTime);
@@ -348,10 +475,9 @@ int main(){
                 printf("|Shell    : %.3f segundos                                    |\n", shellTime);
                 printf("|Bucket   : %.3f segundos                                    |\n", bucketTime);
                 printf("|Counting : %.3f segundos                                    |\n", countingTime);
-                printf("|Radix    : %.3f segundos                                    |\n", radixTime);
                 printf("+-------------------------------------------------------------+\n");
                 break;
-            case 13:
+            case 12:
                 imprimirArray(arr);
                 break;
         }
